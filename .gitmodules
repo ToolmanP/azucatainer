@@ -1,0 +1,12 @@
+[submodule "linux"]
+	path = linux
+	url = git@github.com:ToolmanP/linux.git
+	branch = azucatainer
+[submodule "qemu"]
+	path = qemu
+	url = git@github.com:ToolmanP/qemu.git
+	branch = azucatainer
+[submodule "deps/zpoline"]
+	path = deps/zpoline
+	url = git@github.com:ToolmanP/zpoline.git
+	branch = azucatainer
