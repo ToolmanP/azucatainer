@@ -1,0 +1,28 @@
+#!/bin/bash
+
+ROOT="$(realpath "$(dirname "$0")/..")"
+IMAGE="${IMAGE:-}"
+SHARED="${ROOT}/shared"
+
+if [[ $EUID -ne 0 ]]; then
+    sudo -E "$0" "$@"
+    exit $?
+fi
+
+if [ -z "${IMAGE}" ]; then
+	echo "Please set the IMAGE environment variable to the path of the image file."
+	exit 1
+fi
+
+VIRTIOFSD_SOCK="/tmp/virtiofsd.sock"
+/usr/libexec/virtiofsd --socket-path=${VIRTIOFSD_SOCK} --shared-dir="${SHARED}" &> /dev/null &
+exec qemu-system-x86_64 -machine accel=kvm \
+	-cpu host \
+	-m 16G \
+	-smp 8 \
+	-nographic \
+	-netdev user,id=net0,hostfwd=tcp::2222-:22 \
+	-device virtio-net-pci,netdev=net0 \
+	-chardev socket,id=char0,path=${VIRTIOFSD_SOCK} \
+	-device vhost-user-fs-pci,chardev=char0,tag=azucat \
+	-drive if=virtio,format=qcow2,file="${IMAGE}"

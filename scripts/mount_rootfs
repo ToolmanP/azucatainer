@@ -1,0 +1,35 @@
+#!/bin/bash
+
+NBD="/dev/nbd0"
+PART="p1"
+MOUNTPOINT="${MOUNTPOINT:-}"
+IMAGE="${IMAGE:-}"
+
+set -e
+
+if [[ $EUID -ne 0 ]]; then
+    sudo -E "$0" "$@"
+    exit $?
+fi
+
+if [[ -z $IMAGE || -z $MOUNTPOINT ]]; then
+   echo "IMAGE and MOUNTPOINT must be set"
+   exit 1
+fi
+
+if [[ ! -d "${MOUNTPOINT}" ]]; then 
+   echo "Mount point does not exist: ${MOUNTPOINT}"
+   exit 1
+fi
+
+if [[ -f "${IMAGE}" ]]; then
+   echo "Using image: ${IMAGE}"
+else
+   echo "Image file does not exist: ${IMAGE}"
+   exit 1
+fi
+
+echo "Mounting NBD device... ${IMAGE} -> $NBD -> ${MOUNTPOINT}"
+qemu-nbd -c "${NBD}" "${IMAGE}"
+sleep 1
+mount "${NBD}${PART}" "${MOUNTPOINT}"

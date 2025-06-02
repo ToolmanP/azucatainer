@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+
+RUN sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update
+RUN apt build-dep -yq qemu-system
+RUN apt upgrade -yq
+RUN apt install python3-venv git -y
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN useradd -u 1000 -m mio
+USER mio
+CMD ["/bin/bash"]

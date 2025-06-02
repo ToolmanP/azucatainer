@@ -1,0 +1,31 @@
+#!/bin/bash
+
+ROOT=$(realpath "$(dirname "$(readlink -f "$0")")/..")
+QEMU="${ROOT}/qemu"
+BUILD="${ROOT}/build/qemu"
+CONFIGURE_ARGS="--target-list=x86_64-softmmu --prefix=/build --disable-xen --disable-sndio"
+RECON="${RECON:-0}"
+
+mkdir -p "${BUILD}"
+
+pushd "${QEMU}" &>/dev/null
+
+if [[ $RECON -eq 1 ]]; then
+	docker run -it \
+		--rm \
+		-v "${QEMU}:/app" \
+		-v "${BUILD}:/build" \
+		-w "/app" \
+		toolmanp/azucat_qemu_builder:22.04 \
+		bash -c "./configure ${CONFIGURE_ARGS} && ninja -C build install -j$(nproc)"
+else
+	docker run -it \
+		--rm \
+		-v "${QEMU}:/app" \
+		-v "${BUILD}:/build" \
+		-w "/app" \
+		toolmanp/azucat_qemu_builder:22.04 \
+		bash -c "ninja -C build install -j$(nproc)"
+fi
+
+popd &>/dev/null

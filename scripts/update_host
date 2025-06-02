@@ -1,0 +1,29 @@
+#!/bin/bash
+
+ROOT=$(realpath "$(dirname "$(realpath "$0")")/..")
+CONFIG="$ROOT/configs/host_x86_64_defconfig"
+BUILD="$ROOT/build/host"
+
+MOUNTPOINT="${MOUNTPOINT:-}"
+ROOT="$(realpath $(dirname "$(readlink -f "$0")")/..)"
+
+if [[ $EUID -ne 0 ]]; then
+    sudo -E "$0" "$@"
+    exit $?
+fi
+
+if [[ -z "${MOUNTPOINT}" ]]; then
+	echo "MOUNTPOINT is not set. Please set the MOUNTPOINT environment variable."
+	exit 1
+fi
+
+if ! mountpoint -q ${MOUNTPOINT}; then
+	echo "The specified MOUNTPOINT is not mounted. Please mount it before running this script."
+	exit 1
+fi
+
+
+rsync "${ROOT}/build/host/arch/x86/boot/bzImage" "${MOUNTPOINT}/boot/vmlinuz-6.7.0-rc6"
+rsync "${CONFIG}" "${MOUNTPOINT}/boot/config-6.7.0-rc6"
+rsync "${ROOT}/build/host/System.map" "${MOUNTPOINT}/boot/System.map-6.7.0-rc6"
+exec make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" INSTALL_PATH="${MOUNTPOINT}" INSTALL_MOD_PATH="${MOUNTPOINT}" modules_install 

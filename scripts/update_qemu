@@ -1,0 +1,23 @@
+#!/bin/bash
+
+MOUNTPOINT="${MOUNTPOINT:-}"
+ROOT="$(realpath $(dirname "$(readlink -f "$0")")/..)"
+BUILD="${ROOT}/build/qemu"
+
+
+if [[ $EUID -ne 0 ]]; then
+    sudo -E "$0" "$@"
+    exit $?
+fi
+
+if [[ -z "${MOUNTPOINT}" ]]; then
+	echo "MOUNTPOINT is not set. Please set the MOUNTPOINT environment variable."
+	exit 1
+fi
+
+if ! mountpoint -q ${MOUNTPOINT}; then
+	echo "The specified MOUNTPOINT is not mounted. Please mount it before running this script."
+	exit 1
+fi
+
+exec rsync -a --delete "${BUILD}/" "${MOUNTPOINT}/opt/azucatemu/"

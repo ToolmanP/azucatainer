@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ROOT=$(realpath "$(dirname "$(realpath "$0")")/..")
+CONFIG="$ROOT/configs/guest_x86_64_defconfig"
+BUILD="$ROOT/build/guest"
+
+set -e 
+
+mkdir -p "${BUILD}"
+exec make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" menuconfig

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+NBD="/dev/nbd0"
+MOUNTPOINT="${MOUNTPOINT:-/mnt/nbd}"
+
+set -e
+
+if [[ $EUID -ne 0 ]]; then
+    sudo -E "$0" "$@"
+    exit $?
+fi
+
+
+if [[ -z $MOUNTPOINT ]]; then
+   echo "MOUNTPOINT must be set"
+   exit 1
+fi
+
+echo "Unmounting NBD device... $MOUNTPOINT"
+umount "$MOUNTPOINT" || :
+qemu-nbd -d "$NBD"
+exit 0
