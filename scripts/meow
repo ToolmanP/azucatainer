@@ -4,11 +4,6 @@ ROOT="$(realpath "$(dirname "$0")/..")"
 IMAGE="${IMAGE:-}"
 SHARED="${ROOT}/shared"
 
-if [[ $EUID -ne 0 ]]; then
-    sudo -E "$0" "$@"
-    exit $?
-fi
-
 if [ -z "${IMAGE}" ]; then
 	echo "Please set the IMAGE environment variable to the path of the image file."
 	exit 1
@@ -20,5 +15,7 @@ exec qemu-system-x86_64 -machine accel=kvm \
 	-smp 8 \
 	-nographic \
 	-netdev user,id=net0,hostfwd=tcp::2222-:22 \
+	-fsdev local,security_model=passthrough,id=fsdev0,path="${SHARED}" \
+	-device virtio-9p-pci,fsdev=fsdev0,mount_tag=hostshare \
 	-device virtio-net-pci,netdev=net0 \
 	-drive if=virtio,format=qcow2,file="${IMAGE}"
