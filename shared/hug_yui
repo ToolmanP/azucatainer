@@ -10,7 +10,7 @@ fi
 
 
 ROOT=$(realpath $(dirname $0))
-CUSTOM_QEMU=${CUSTOM_QEMU:-0}
+DEBUG=${DEBUG:-0}
 APP=$1
 
 set -e
@@ -20,6 +20,12 @@ KERNEL="/root/yui/vmlinux.yui"
 INITRD="${ROOT}/${APP}.cpio.gz"
 echo "Using kernel: ${KERNEL}"
 echo "Using initrd: ${INITRD}"
+QEMU_DEBUG_FLAGS="-s -S"
+QEMU_EXTRA_DEBUG_FLAGS=""
+
+if [[ $DEBUG -eq 1 ]]; then
+    QEMU="${QEMU} ${QEMU_DEBUG_FLAGS} ${QEMU_EXTRA_DEBUG_FLAGS}"
+fi
 
 exec ${QEMU} \
 -enable-kvm -display none \
