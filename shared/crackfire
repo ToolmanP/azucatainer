@@ -1,0 +1,4 @@
+#!/bin/bash
+
+image="docker.io/library/busybox:latest"
+nerdctl run --net=none --runtime "io.containerd.kata.v2" --rm -t --name test-kata "$image" date
