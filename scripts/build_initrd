@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+ROOT=$(realpath "$(dirname "$0")/..")
+
+set -e
+
+if [ ! -d "$ROOT/images/rootfs" ]; then
+		echo "Error: rootfs directory does not exist at $ROOT/images/rootfs"
+		echo "Please extract a minimal alpine rootfs into that directory."
+		exit 1
+fi
+
+
+if [[ -z "$1" ]]; then
+		echo "Usage: $0 <filename>"
+		exit 1
+fi
+
+pushd "$ROOT/images/rootfs" &> /dev/null
+find . -print0 | cpio --null -o --format=newc | gzip -9 > "$ROOT/shared/$1.cpio.gz"
+echo "Created initrd at $ROOT/shared/$1.cpio.gz"
+popd &> /dev/null
