@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+ROOT=$(realpath $(dirname "$(realpath "$0")")/..)
+ROOTFS="${ROOT}/images/rootfs"
+DESTDIR="${ROOTFS}"
+ZPOLINE_BASE="${ROOT}/deps/zpoline"
+export CFLAGS="--sysroot=${ROOTFS}"
+export LDFLAGS="--sysroot=${ROOTFS}"
+make -C "${ZPOLINE_BASE}" clean
+make -C "${ZPOLINE_BASE}" all
+install -m 644 "${ZPOLINE_BASE}/libzpoline.so" "${ROOTFS}/usr/lib/libzpoline.so"
+make -C "${ROOT}/linux/tools/zpoline" O="${BUILD}" DESTDIR="${DESTDIR}" KCONFIG_CONFIG="$CONFIG" clean
+make -C "${ROOT}/linux/tools/zpoline" O="${BUILD}" DESTDIR="${DESTDIR}" KCONFIG_CONFIG="$CONFIG" install
