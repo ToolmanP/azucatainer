@@ -1,0 +1,39 @@
+#!/bin/bash
+
+ROOT=$(realpath "$(dirname "$(realpath "$0")")/..")
+BR2_CONFIG="${ROOT}/configs/buildroot_defconfig"
+BR2="${ROOT}/deps/buildroot"
+ROOTFS="${ROOT}/images/rootfs"
+
+set -e
+
+cp ${BR2_CONFIG} ${BR2}/.config
+make -C ${BR2} -j$(nproc)
+mkdir -p ${ROOTFS}
+cp ${BR2}/output/images/rootfs.cpio.gz ${ROOTFS}
+pushd  ${ROOTFS} &> /dev/null
+gzip -cd rootfs.cpio.gz | cpio -idmv
+rm rootfs.cpio.gz
+cat <<EOF > init
+#!/bin/sh
+# devtmpfs does not get automounted for initramfs
+/bin/mount -t devtmpfs devtmpfs /dev
+
+# use the /dev/console device node from devtmpfs if possible to not
+# confuse glibc's ttyname_r().
+# This may fail (E.G. booted with console=), and errors from exec will
+# terminate the shell, so use a subshell for the test
+if (exec 0</dev/console) 2>/dev/null; then
+    exec 0</dev/console
+    exec 1>/dev/console
+    exec 2>/dev/console
+fi
+
+/bin/busybox echo "127.0.0.1 localhost" > /etc/hosts
+/bin/busybox echo "::1 localhost ip6-localhost ip6-loopback" >> /etc/hosts
+/bin/busybox mount -t sysfs sysfs /sys
+/bin/busybox mount -t proc proc /proc
+/bin/busybox mount -t tmpfs tmpfs /tmp
+exec /bin/sh
+EOF
+popd &> /dev/null
