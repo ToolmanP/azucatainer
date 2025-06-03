@@ -11,13 +11,12 @@ if [ ! -d "$ROOT/images/rootfs" ]; then
 		exit 1
 fi
 
-
 if [[ -z "$1" ]]; then
 		echo "Usage: $0 <filename>"
 		exit 1
 fi
 
 pushd "$ROOT/images/rootfs" &> /dev/null
-find . -print0 | cpio --null -o --format=newc | gzip -9 > "$ROOT/shared/$1.cpio.gz"
+find . -print0 | cpio --null -o --format=newc --owner=0:0 | gzip -9 > "$ROOT/shared/apps/$1.cpio.gz"
 echo "Created initrd at $ROOT/shared/$1.cpio.gz"
 popd &> /dev/null

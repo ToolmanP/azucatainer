@@ -29,6 +29,6 @@ exec ${QEMU} \
 -smp 1,cores=1,threads=1,sockets=1,maxcpus=1 \
 -append "console=ttyS0" \
 -bios /opt/kata/share/kata-qemu/qemu/qboot.rom \
--initrd "${ROOT}/${APP}.cpio.gz" \
+-initrd "${ROOT}/apps/${APP}.cpio.gz" \
 -kernel ${KERNEL} \
 -serial stdio 
