@@ -12,7 +12,7 @@ make -C ${BR2} -j$(nproc)
 mkdir -p ${ROOTFS}
 cp ${BR2}/output/images/rootfs.cpio.gz ${ROOTFS}
 pushd  ${ROOTFS} &> /dev/null
-gzip -cd rootfs.cpio.gz | cpio -idmv
+gzip -cd rootfs.cpio.gz | cpio -idmv || true
 rm rootfs.cpio.gz
 cp -r ${BR2}/output/staging/usr/include ${ROOTFS}/usr/include
 cat <<EOF > init
