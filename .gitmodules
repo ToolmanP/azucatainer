@@ -14,3 +14,6 @@
 	path = deps/buildroot
 	url = git@github.com:buildroot/buildroot.git
 	branch = 2025.02.x
+[submodule "tests/sqlite"]
+	path = tests/sqlite
+	url = git@github.com:ukontainer/sqlite-bench.git
