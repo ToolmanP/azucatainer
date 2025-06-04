@@ -1,0 +1,12 @@
+#!/bin/bash
+
+ROOT=$(realpath "$(dirname $0)/..")
+SQLITE="${ROOT}/tests/sqlite"
+ROOTFS=${ROOT}/images/rootfs
+
+CFLAGS="--sysroot=${ROOTFS} -O2"
+LDFLAGS="--sysroot=${ROOTFS} -lm -ldl"
+
+make CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" -C ${SQLITE}
+
+cp ${SQLITE}/sqlite-bench ${ROOTFS}/opt/testcases/bin/
