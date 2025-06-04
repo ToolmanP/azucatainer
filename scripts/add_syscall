@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ROOT=$(realpath $(dirname "$(readlink -f "$0")")/..)
+ROOTFS="$ROOT/images/rootfs"
+LTP="${ROOT}/tests/ltp"
+
+if [[ $# -eq 0 ]]; then
+	echo "Usage: $0 syscall1 syscall2 ..."
+	echo "Example: $0 open read write"
+	exit 1
+fi
+
+pushd "${LTP}" > /dev/null
+for syscall in "$@"; do
+	if [[ -d testcases/kernel/syscalls/${syscall} ]]; then
+		make -C testcases/kernel/syscalls/${syscall} DESTDIR="${ROOTFS}" install
+	fi
+done
+popd > /dev/null

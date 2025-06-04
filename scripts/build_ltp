@@ -1,0 +1,26 @@
+#!/bin/bash
+
+ROOT=$(realpath "$(dirname $0)/..")
+ROOTFS="$ROOT/images/rootfs"
+LTP="${ROOT}/tests/ltp"
+
+pushd ${LTP} &> /dev/null
+
+./build.sh -r autotools
+export CFLAGS="--sysroot=${ROOTFS} -Wno-stringop-overflow -Wno-format"
+export LDFLAGS="--sysroot=${ROOTFS}"
+./configure --prefix=/opt
+make FILTER_OUT_DIRS="delete_module finit_module lsm init_module sched_getattr sched_setattr" -j$(nproc) -C testcases/kernel/syscalls
+
+
+cat <<EOF > ${ROOTFS}/opt/run_tests.sh
+#!/bin/sh
+for binary in \$(find /opt/testcases/bin -type f -executable); do
+		echo "Running \$binary"
+		\$binary
+done
+EOF
+
+chmod +x ${ROOTFS}/opt/run_tests.sh
+
+popd &> /dev/null
