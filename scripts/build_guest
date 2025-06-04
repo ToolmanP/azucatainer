@@ -8,4 +8,5 @@ set -e
 
 mkdir -p "${BUILD}"
 make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" olddefconfig
-exec make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" -j$(nproc)
+make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" -j$(nproc)
+exec make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" -j$(nproc) headers_install
