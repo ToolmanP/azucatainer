@@ -17,3 +17,7 @@
 [submodule "tests/sqlite"]
 	path = tests/sqlite
 	url = git@github.com:ukontainer/sqlite-bench.git
+[submodule "tests/ltp"]
+	path = tests/ltp
+	url = git@github.com:ToolmanP/ltp.git
+	branch = azucatainer
