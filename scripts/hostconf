@@ -1,10 +1,20 @@
 #!/bin/bash
 
 ROOT=$(realpath "$(dirname "$(realpath "$0")")/..")
+SELF=$(realpath "$0")
 CONFIG="$ROOT/configs/host_x86_64_defconfig"
 BUILD="$ROOT/build/host"
 
 set -e 
+
+if [[ ! -f /.dockerenv ]]; then
+	exec docker run -it --rm \
+		-v $ROOT:$ROOT \
+		-w $ROOT \
+		-u 1000:1000 \
+		toolmanp/azucat_linux_builder:41 \
+		bash $SELF "$@"
+fi
 
 mkdir -p "${BUILD}"
 exec make -C "${ROOT}/linux" O="${BUILD}" KCONFIG_CONFIG="$CONFIG" menuconfig
