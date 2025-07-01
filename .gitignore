@@ -4,3 +4,4 @@ build/
 shared/**/*.cpio.gz
 *.old
 .cache
+shared/vmlinux.yui

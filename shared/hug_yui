@@ -16,7 +16,7 @@ APP=$1
 set -e
 
 QEMU="/opt/azucatemu/bin/qemu-system-x86_64"
-KERNEL="/root/yui/vmlinux.yui"
+KERNEL="/root/shared/vmlinux.yui"
 INITRD="${ROOT}/${APP}.cpio.gz"
 echo "Using kernel: ${KERNEL}"
 echo "Using initrd: ${INITRD}"
@@ -32,8 +32,8 @@ exec ${QEMU} \
 -machine q35,accel=kvm,nvdimm=on \
 -cpu host,pmu=off,xsave=off \
 -m 2048M,slots=10,maxmem=128939M \
--smp 1,cores=1,threads=1,sockets=1,maxcpus=1 \
--append "console=ttyS0" \
+-smp 2,cores=2,threads=1,sockets=1 \
+-append "console=ttyS0 pti=off nospectre_v1 nospectre_v2" \
 -bios /opt/kata/share/kata-qemu/qemu/qboot.rom \
 -initrd "${ROOT}/apps/${APP}.cpio.gz" \
 -kernel ${KERNEL} \

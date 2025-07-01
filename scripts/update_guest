@@ -1,23 +1,5 @@
 #!/bin/bash
 
-MOUNTPOINT="${MOUNTPOINT:-}"
 ROOT="$(realpath $(dirname "$(readlink -f "$0")")/..)"
 
-if [[ $EUID -ne 0 ]]; then
-    sudo -E "$0" "$@"
-    exit $?
-fi
-
-if [[ -z "${MOUNTPOINT}" ]]; then
-	echo "MOUNTPOINT is not set. Please set the MOUNTPOINT environment variable."
-	exit 1
-fi
-
-if ! mountpoint -q ${MOUNTPOINT}; then
-	echo "The specified MOUNTPOINT is not mounted. Please mount it before running this script."
-	exit 1
-fi
-
-
-mkdir -p "${MOUNTPOINT}/root/yui/"
-exec rsync "${ROOT}/build/guest/vmlinux" "${MOUNTPOINT}/root/yui/vmlinux.yui"
+exec rsync "${ROOT}/build/guest/vmlinux" "${ROOT}/shared/vmlinux.yui"
